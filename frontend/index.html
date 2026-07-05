@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service Assistant</title>
+    <!-- Use a modern Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css?v=4">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Header Area -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon"></div>
+                <h1>CS Assistant</h1>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item active" id="navMain">채팅 (Chat)</div>
+                <div class="nav-item" id="navLogs">로그 기록 (Logs)</div>
+                <div class="nav-item" id="navSettings">설정 (Settings)</div>
+            </div>
+            <div class="status-panel">
+                <div class="status-indicator"></div>
+                <span>System Online</span>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-container">
+            <header class="chat-header">
+                <h2>Customer Support AI</h2>
+                <select id="modelSelect" class="model-select">
+                    <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                    <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                    <option value="gemini-2.0-pro">Gemini 2.0 Pro</option>
+                    <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                    <option value="gemini-3.0-flash">Gemini 3.0 Flash</option>
+                    <option value="gemini-3.0-pro">Gemini 3.0 Pro</option>
+                    <option value="gemini-3.1-pro">Gemini 3.1 Pro</option>
+                    <option value="gemini-3.5-flash">Gemini 3.5 Flash (Latest)</option>
+                    <option value="gemini-3.5-pro">Gemini 3.5 Pro (Latest)</option>
+                </select>
+            </header>
+            
+            <div class="chat-messages" id="chatMessages">
+                <!-- Chat messages will be injected here -->
+            </div>
+            
+            <div class="chat-messages hidden" id="logsContainer">
+                <!-- Detailed logs (chat + tool traces) will be injected here -->
+            </div>
+            
+            <!-- Real-time Status Indicator (Tool Execution) -->
+            <div class="tool-status" id="toolStatus">
+                <div class="spinner"></div>
+                <span id="toolStatusText"></span>
+            </div>
+
+            <div class="chat-input-area">
+                <form id="chatForm">
+                    <input type="text" id="messageInput" placeholder="질문을 입력하세요... (예: 환불규정 알려줘)" autocomplete="off">
+                    <button type="submit" id="sendBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                    </button>
+                </form>
+            </div>
+        </main>
+        
+        <!-- Right Column: Live Ticket State Dashboard -->
+        <aside class="ticket-panel">
+            <div class="ticket-header">
+                <h2>🎫 라이브 고객 상태 (Ticket)</h2>
+                <p>AI가 수집한 고객 정보를 실시간 추적합니다.</p>
+            </div>
+            <div class="ticket-body">
+                <div class="ticket-item">
+                    <div class="ticket-label">고객 의도 (Intent)</div>
+                    <div class="ticket-value" id="ticketIntent">-</div>
+                </div>
+                <div class="ticket-item">
+                    <div class="ticket-label">주문 번호 (Order #)</div>
+                    <div class="ticket-value" id="ticketOrder">-</div>
+                </div>
+                <div class="ticket-item">
+                    <div class="ticket-label">긴급도 (Urgency)</div>
+                    <div class="ticket-value" id="ticketUrgency">-</div>
+                </div>
+                <div class="ticket-item">
+                    <div class="ticket-label">요약 (Summary)</div>
+                    <div class="ticket-value summary-value" id="ticketSummary">-</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button id="closeSettingsBtn" class="icon-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label>라우팅 모드 (Routing Mode)</label>
+                    <select id="routingModeSelect" class="form-control" style="cursor: pointer;">
+                        <option value="llm">LLM Router (권장: Gemini 2.5 Flash)</option>
+                        <option value="keyword">Keyword Matching (키워드 기반)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>라우팅 전용 LLM (Router Model)</label>
+                    <select id="routerModelSelect" class="form-control" style="cursor: pointer;">
+                        <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash (권장)</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                        <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>System Prompt</label>
+                    <textarea class="form-control" rows="5" disabled>당신은 고객 서비스 및 일반 상담을 담당하는 전문 AI 상담원입니다. 사용자의 질문이나 요청에 대해 가장 도움이 되는 답변을 제공해야 합니다.</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js?v=4"></script>
+</body>
+</html>
